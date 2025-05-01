@@ -146,7 +146,7 @@ public class IgPhoto(string filename, byte[]? fileContents = null, FileInfo? fil
                 }
             }
 
-            Metadata ??= PhotoCodec.LoadMetadata(Filename, this.FileContents, this.FileInfo, options);
+            Metadata = PhotoCodec.LoadMetadata(Filename, this.FileContents, this.FileInfo, options);
 
             FrameCount = Metadata?.FrameCount ?? 0;
 
@@ -168,7 +168,7 @@ public class IgPhoto(string filename, byte[]? fileContents = null, FileInfo? fil
 
             ImgData = await PhotoCodec.LoadAsync(Filename,
                 this.FileContents, this.FileInfo,
-                options, null, _tokenSrc?.Token);
+                options, null, Metadata, _tokenSrc?.Token);
 
             // cancel if requested
             if (_tokenSrc is not null && _tokenSrc.IsCancellationRequested)

@@ -1121,6 +1121,34 @@ public partial class FrmMain : ThemedForm
                 enableFadingTrainsition = !_isShowingImagePreview && !isImageBigForFading;
             }
 
+            int orientation = e.Data.ImgData.ExifOrientation;
+
+            ImgTransform? transforms = null;
+
+            switch (orientation)
+            {
+                case 2:
+                    transforms = new ImgTransform { Flips = FlipOptions.Horizontal, };
+                    break;
+                case 3:
+                    transforms = new ImgTransform { Rotation = 180, };
+                    break;
+                case 4:
+                    transforms = new ImgTransform { Flips = FlipOptions.Vertical, };
+                    break;
+                case 5:
+                    transforms = new ImgTransform { Rotation = 90, Flips = FlipOptions.Horizontal, };
+                    break;
+                case 6:
+                    transforms = new ImgTransform { Rotation = 90, };
+                    break;
+                case 7:
+                    transforms = new ImgTransform { Rotation = 270, Flips = FlipOptions.Horizontal, };
+                    break;
+                case 8:
+                    transforms = new ImgTransform { Rotation = 270, };
+                    break;
+            }
 
             // set the main image
             PicMain.SetImage(e.Data.ImgData,
@@ -1128,7 +1156,9 @@ public partial class FrmMain : ThemedForm
                 frameIndex: e.FrameIndex,
                 resetZoom: e.ResetZoom,
                 enableFading: enableFadingTrainsition,
-                channels: Local.ImageChannels);
+                channels: Local.ImageChannels,
+                transforms: transforms
+                );
 
             // update window fit
             if (e.ResetZoom && Config.EnableWindowFit)

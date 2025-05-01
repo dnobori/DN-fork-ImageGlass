@@ -308,6 +308,7 @@ public partial class BHelper
             IgnoreInaccessible = true,
             AttributesToSkip = skipAttrs,
             RecurseSubdirectories = searchAllDirectories,
+            BufferSize = 4 * 1024 * 1024
         }).Where(path => filterFn == null ? true : filterFn(path));
 
 

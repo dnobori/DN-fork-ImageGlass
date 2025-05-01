@@ -811,9 +811,11 @@ public class Local
         _ = GCCollectAsync(delayMs, _gcTokenSrc.Token);
     }
 
+#pragma warning disable CS1998 // 非同期メソッドは、'await' 演算子がないため、同期的に実行されます
     private static async Task GCCollectAsync(int delayMs, CancellationToken token)
+#pragma warning restore CS1998 // 非同期メソッドは、'await' 演算子がないため、同期的に実行されます
     {
-        try
+        /*try
         {
             // check if task is cancelled
             token.ThrowIfCancellationRequested();
@@ -831,7 +833,7 @@ public class Local
             GC.Collect();
         }
         catch (TaskCanceledException) { }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException) { }*/
     }
 
 

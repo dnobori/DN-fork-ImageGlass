@@ -77,5 +77,6 @@ public class IgMetadata
     public float? ExifFNumber { get; set; } = null;
     public int? ExifISOSpeed { get; set; } = null;
     public float? ExifFocalLength { get; set; } = null;
+    public int ExifOrientation { get; set; } = 0;
 
 }

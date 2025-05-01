@@ -312,6 +312,8 @@ public static class PhotoCodec
                     // ExifRatingPercent
                     meta.ExifRatingPercent = GetExifValue(exifProfile, ExifTag.RatingPercent);
 
+                    meta.ExifOrientation = GetExifValue(exifProfile, ExifTag.Orientation);
+
                     // ExifDateTimeOriginal
                     var dt = GetExifValue(exifProfile, ExifTag.DateTimeOriginal);
                     meta.ExifDateTimeOriginal = BHelper.ConvertDateTime(dt);
@@ -409,7 +411,7 @@ public static class PhotoCodec
     /// <param name="options">Loading options</param>
     /// <param name="token">Cancellation token</param>
     public static async Task<IgImgData> LoadAsync(string filePath, byte[] fileContents, FileInfo fileInfo,
-        CodecReadOptions? options = null, ImgTransform? transform = null,
+        CodecReadOptions? options = null, ImgTransform? transform = null, IgMetadata? metaData = null,
         CancellationToken? token = null)
     {
         options ??= new();
@@ -417,7 +419,7 @@ public static class PhotoCodec
 
         try
         {
-            var (loadSuccessful, result, ext, settings) = ReadWithStream(filePath, fileContents, fileInfo, options, transform);
+            var (loadSuccessful, result, ext, settings) = ReadWithStream(filePath, fileContents, fileInfo, options, transform, metaData);
 
             if (!loadSuccessful)
             {
@@ -455,7 +457,15 @@ public static class PhotoCodec
             file.Read(data, 0, data.Length);
         }
 
-        return await LoadAsync(filePath, data, info, options, transform, token);
+        IgMetadata? metadata = null;
+
+        try
+        {
+            metadata = LoadMetadata(filePath, data, info, options);
+        }
+        catch { }
+
+        return await LoadAsync(filePath, data, info, options, transform, metadata, token);
     }
 
     /// <summary>
@@ -1092,6 +1102,55 @@ public static class PhotoCodec
                         ms1.Position = 0;
 
                         var img = WicBitmapSource.Load(ms1);
+
+                        if (metadata != null)
+                        {
+                            result.ExifOrientation = metadata.ExifOrientation;
+
+                            /*int rotateType = metadata.ExifOrientation;
+
+                            WICBitmapTransformOptions rotateOption1 = WICBitmapTransformOptions.WICBitmapTransformRotate0;
+                            WICBitmapTransformOptions rotateOption2 = WICBitmapTransformOptions.WICBitmapTransformRotate0;
+
+                            switch (rotateType)
+                            {
+                                case 2:
+                                    rotateOption1 = WICBitmapTransformOptions.WICBitmapTransformFlipHorizontal;
+                                    break;
+                                case 3:
+                                    rotateOption1 = WICBitmapTransformOptions.WICBitmapTransformRotate180;
+                                    break;
+                                case 4:
+                                    rotateOption1 = WICBitmapTransformOptions.WICBitmapTransformFlipVertical;
+                                    break;
+                                case 5:
+                                    rotateOption1 = WICBitmapTransformOptions.WICBitmapTransformRotate90;
+                                    rotateOption2 = WICBitmapTransformOptions.WICBitmapTransformFlipHorizontal;
+                                    break;
+                                case 6:
+                                    rotateOption1 = WICBitmapTransformOptions.WICBitmapTransformRotate90;
+                                    break;
+                                case 7:
+                                    rotateOption1 = WICBitmapTransformOptions.WICBitmapTransformRotate270;
+                                    rotateOption2 = WICBitmapTransformOptions.WICBitmapTransformFlipHorizontal;
+                                    break;
+                                case 8:
+                                    rotateOption1 = WICBitmapTransformOptions.WICBitmapTransformRotate270;
+                                    break;
+                            }
+
+                            if (rotateOption1 != WICBitmapTransformOptions.WICBitmapTransformRotate0)
+                            {
+                                img.FlipRotate(rotateOption1);
+                            }
+
+                            if (rotateOption2 != WICBitmapTransformOptions.WICBitmapTransformRotate0)
+                            {
+                                img.FlipRotate(rotateOption2);
+                            }*/
+
+                            //img.FlipRotate( WICBitmapTransformOptions.WICBitmapTransformRotate90);
+                        }
 
                         result.Image = img;
                     }

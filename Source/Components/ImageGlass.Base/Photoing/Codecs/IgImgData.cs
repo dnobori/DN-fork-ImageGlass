@@ -99,6 +99,8 @@ public class IgImgData : IDisposable
     public bool HasAlpha { get; set; } = false;
     public bool CanAnimate { get; set; } = false;
 
+    public int ExifOrientation { get; set; } = 0;
+
 
     public IgImgData() { }
 

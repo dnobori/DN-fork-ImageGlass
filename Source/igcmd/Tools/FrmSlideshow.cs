@@ -977,9 +977,9 @@ public partial class FrmSlideshow : ThemedForm
         }
 
         // Collect system garbage
-        GC.Collect();
+        /*GC.Collect();
         GC.WaitForPendingFinalizers();
-        GC.Collect();
+        GC.Collect();*/
     }
 
     #endregion // Load image
