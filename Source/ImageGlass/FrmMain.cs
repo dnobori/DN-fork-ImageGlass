@@ -57,6 +57,8 @@ public partial class FrmMain : ThemedForm
     public FrmMain() : base()
     {
         InitializeComponent();
+        Text = App.AppName;
+
         InitializeToolbarContext();
 
         // initialize UI thread reporter

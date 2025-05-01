@@ -23,6 +23,7 @@ using ImageGlass.Base.WinApi;
 using ImageGlass.Settings;
 using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 
 namespace ImageGlass;
 
@@ -257,3 +258,5 @@ internal static class Program
         }
     }
 }
+
+

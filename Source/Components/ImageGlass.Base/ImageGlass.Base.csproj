@@ -14,6 +14,7 @@
 
         <LangVersion>latest</LangVersion>
         <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
+      <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyyMMddHHmmss"))</SourceRevisionId>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows10.0.19041.0|ARM64'">
