@@ -54,7 +54,8 @@
             LblHsl = new UI.ModernLabel();
             TxtLocation = new UI.ModernTextBox();
             BtnCopyLocation = new UI.ModernButton();
-            TooltipMain = new UI.ModernTooltip();
+            // TooltipMain = new UI.ModernTooltip();
+            TooltipMain = new ToolTip();
             TableLayout.SuspendLayout();
             PanColor.SuspendLayout();
             SuspendLayout();
@@ -460,9 +461,9 @@
             // 
             // TooltipMain
             // 
-            TooltipMain.AllPadding = 4;
-            TooltipMain.DarkMode = false;
-            TooltipMain.OwnerDraw = true;
+            //TooltipMain.AllPadding = 4;
+            //TooltipMain.DarkMode = false;
+            //TooltipMain.OwnerDraw = true;
             // 
             // FrmColorPicker
             // 
@@ -511,6 +512,6 @@
         private UI.ModernButton BtnCopyCIELab;
         private UI.ModernTextBox TxtCIELAB;
         private UI.ModernLabel LblCIELAB;
-        private UI.ModernTooltip TooltipMain;
+        private ToolTip TooltipMain;
     }
 }

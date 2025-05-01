@@ -99,8 +99,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\EggShell\Source\EggShell\D2Phap.EggShell.csproj" />
         <ProjectReference Include="..\ImageGlass.Webp\ImageGlass.WebP.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="D2Phap.EggShell">
+        <HintPath>..\..\..\Lib\D2Phap.EggShell.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

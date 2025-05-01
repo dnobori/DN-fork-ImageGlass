@@ -31,7 +31,8 @@ public class ModernToolbar : ToolStrip
     private ToolbarAlignment _alignment = ToolbarAlignment.Center;
     private uint _iconHeight = Const.TOOLBAR_ICON_HEIGHT;
 
-    private readonly ModernTooltip _tooltip = new();
+    // private readonly ModernTooltip _tooltip = new();
+    private readonly ToolTip _tooltip = new();
     private CancellationTokenSource _tooltipTokenSrc = new();
     private ToolStripItem? _hoveredItem = null;
 
@@ -449,7 +450,7 @@ public class ModernToolbar : ToolStrip
                 // tooltip direction is bottom
                 tooltipPosY = item.Bounds.Top
                     - item.Padding.Top
-                    - (int)DpiApi.Scale(SystemInformation.MenuFont.Size);
+                    - (int)DpiApi.Scale(FastFont2.GetDefaultFont().Size);
             }
             else
             {
@@ -568,7 +569,7 @@ public class ModernToolbar : ToolStrip
 
         if (Theme is null) return;
 
-        _tooltip.DarkMode = Theme.Settings.IsDarkMode;
+        //_tooltip.DarkMode = Theme.Settings.IsDarkMode;
         SuspendLayout();
 
         // update toolbar theme

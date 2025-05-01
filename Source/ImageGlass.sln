@@ -23,8 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageGlass.WebP", "Componen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImageGlass.WinTouch", "Components\ImageGlass.WinTouch\ImageGlass.WinTouch.csproj", "{96A8D885-BB41-428F-90F5-021F345B4166}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "D2Phap.EggShell", "..\..\EggShell\Source\EggShell\D2Phap.EggShell.csproj", "{A1B3D75E-69BD-8F1B-949A-409D18E3E0CC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

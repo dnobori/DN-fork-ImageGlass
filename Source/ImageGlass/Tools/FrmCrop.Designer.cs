@@ -51,7 +51,8 @@ namespace ImageGlass
             BtnSaveAs = new ModernButton();
             BtnCopy = new ModernButton();
             BtnCrop = new ModernButton();
-            TooltipMain = new ModernTooltip();
+            //TooltipMain = new ModernTooltip();
+            TooltipMain = new ToolTip();
             TableTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)NumX).BeginInit();
             ((System.ComponentModel.ISupportInitialize)NumY).BeginInit();
@@ -374,9 +375,9 @@ namespace ImageGlass
             // 
             // TooltipMain
             // 
-            TooltipMain.AllPadding = 4;
-            TooltipMain.DarkMode = false;
-            TooltipMain.OwnerDraw = true;
+            //TooltipMain.AllPadding = 4;
+            //TooltipMain.DarkMode = false;
+            //TooltipMain.OwnerDraw = true;
             // 
             // FrmCrop
             // 
@@ -428,6 +429,7 @@ namespace ImageGlass
         private ModernButton BtnReset;
         private ModernButton BtnQuickSelect;
         private ModernButton BtnSettings;
-        private ModernTooltip TooltipMain;
+        //private ModernTooltip TooltipMain;
+        private ToolTip TooltipMain;
     }
 }

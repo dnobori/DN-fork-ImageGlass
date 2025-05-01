@@ -156,7 +156,7 @@ public class ModernMenu(IContainer container) : ContextMenuStrip(container)
     {
         menu ??= this;
         var dpiScale = CurrentDpi / 96f;
-        var currentFontSize = SystemInformation.MenuFont.SizeInPoints;
+        var currentFontSize = FastFont2.GetDefaultFont().SizeInPoints;
 
         // standard menu height
         var fontSizeDiff = Math.Max(0, currentFontSize - 9 - dpiScale) * dpiScale;
