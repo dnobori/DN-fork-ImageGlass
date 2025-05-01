@@ -80,7 +80,7 @@ public partial class FrmCrop : ToolForm, IToolForm<CropToolConfig>
         }
 
         TableTop.BackColor = Config.Theme.ColorPalatte.AppBg;
-        TooltipMain.DarkMode = darkMode;
+        //TooltipMain.DarkMode = darkMode;
 
 
         base.ApplyTheme(darkMode, style);

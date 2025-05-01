@@ -45,6 +45,10 @@ internal static class Program
     [STAThread]
     static void Main()
     {
+        ImageGlass.UI.FastFont1.SetFormsDefaultFontForBootSpeedUp(null);
+        ImageGlass.UI.FastFont2.SetFormsDefaultFontForBootSpeedUp(null);
+        ImageGlass.UI.FastFont3.SetFormsDefaultFontForBootSpeedUp(null);
+
         #region App configs
 
         // use independent culture for formatting or parsing a string

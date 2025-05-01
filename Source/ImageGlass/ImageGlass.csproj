@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Exe</OutputType>
         <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWindowsForms>true</UseWindowsForms>
@@ -166,6 +166,11 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
+        <Compile Update="Properties\Settings.Designer.cs">
+          <DesignTimeSharedInput>True</DesignTimeSharedInput>
+          <AutoGen>True</AutoGen>
+          <DependentUpon>Settings.settings</DependentUpon>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
@@ -221,6 +226,10 @@
         <None Update="Icons\Warning.svg">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <None Update="Properties\Settings.settings">
+          <Generator>SettingsSingleFileGenerator</Generator>
+          <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+        </None>
     </ItemGroup>
 
 
@@ -239,7 +248,7 @@
         <ItemGroup>
             <IG_Themes Include="..\..\Setup\Assets\Themes\**\*.*" />
             <IG_Langs Include="..\..\Setup\Assets\Language\**\*.*" />
-            <Web_UI Include="..\Components\ImageGlass.Settings\WebUI\dist\**\*.*" />
+            <Web_UI Include="..\Components\ImageGlass.Settings\WebUI_From_Release\WebUI\**\*.*" />
         </ItemGroup>
 
         <Copy SourceFiles="@(IG_Themes)" DestinationFolder="$(OutputPath)\Themes\%(RecursiveDir)" SkipUnchangedFiles="true" />

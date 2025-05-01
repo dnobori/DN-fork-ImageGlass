@@ -68,7 +68,7 @@ public partial class FrmColorPicker : ToolForm, IToolForm<ColorPickerConfig>
         }
 
         TableLayout.BackColor = Config.Theme.ColorPalatte.AppBg;
-        TooltipMain.DarkMode = darkMode;
+        //TooltipMain.DarkMode = darkMode;
 
         base.ApplyTheme(darkMode, style);
 

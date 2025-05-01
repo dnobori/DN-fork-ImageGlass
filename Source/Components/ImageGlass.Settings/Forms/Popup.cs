@@ -400,7 +400,8 @@ public partial class Popup : DialogForm
     {
         InitializeComponent();
 
-        lblHeading.Font = new Font(lblHeading.Font.FontFamily, SystemInformation.MenuFont.SizeInPoints * 1.35f);
+        //lblHeading.Font = new Font(lblHeading.Font.FontFamily, SystemInformation.MenuFont.SizeInPoints * 1.35f);
+        lblHeading.Font = FastFont3.GetDefaultFont();
         CloseFormHotkey = Keys.Escape;
         ShowInTaskbar = false;
         Heading = "";

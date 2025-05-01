@@ -37,7 +37,7 @@ public class ModernTooltip : ToolTip
     /// <summary>
     /// Gets, sets all padding of tooltip.
     /// </summary>
-    public int AllPadding { get; set; } = (int)SystemInformation.MenuFont.SizeInPoints / 2;
+    public int AllPadding { get; set; } = (int)FastFont2.GetDefaultFont().SizeInPoints / 2;
 
 
     /// <summary>
@@ -98,7 +98,8 @@ public class ModernTooltip : ToolTip
         var titleFontHeight = 0;
         if (!string.IsNullOrWhiteSpace(ToolTipTitle))
         {
-            using var titleFont = new Font(SystemInformation.MenuFont.FontFamily, SystemInformation.MenuFont.SizeInPoints, FontStyle.Bold);
+            //using var titleFont = new Font(SystemInformation.MenuFont.FontFamily, SystemInformation.MenuFont.SizeInPoints, FontStyle.Bold);
+            var titleFont = new Font(FastFont2.GetDefaultFont().FontFamily, FastFont2.GetDefaultFont().SizeInPoints, FontStyle.Bold);
 
             titleFontHeight = titleFont.Height;
             bounds.Offset(0, padding);
@@ -109,7 +110,8 @@ public class ModernTooltip : ToolTip
 
         // draw tooltip content
         bounds.Offset(0, titleFontHeight + padding);
-        TextRenderer.DrawText(e.Graphics, e.ToolTipText, SystemInformation.MenuFont, bounds, ForeColor, TextFormatFlags.Top);
+        //TextRenderer.DrawText(e.Graphics, e.ToolTipText, SystemInformation.MenuFont, bounds, ForeColor, TextFormatFlags.Top);
+        TextRenderer.DrawText(e.Graphics, e.ToolTipText, FastFont2.GetDefaultFont(), bounds, ForeColor, TextFormatFlags.Top);
     }
 
 
@@ -125,12 +127,14 @@ public class ModernTooltip : ToolTip
 
         var padding = DpiApi.Scale(AllPadding);
         var titleSize = new SizeF();
-        var contentSize = g.MeasureString(tooltipContent, SystemInformation.MenuFont);
+        //var contentSize = g.MeasureString(tooltipContent, SystemInformation.MenuFont);
+        var contentSize = g.MeasureString(tooltipContent, FastFont2.GetDefaultFont());
 
         // get tooltip title size
         if (!string.IsNullOrWhiteSpace(ToolTipTitle))
         {
-            using var titleFont = new Font(SystemInformation.MenuFont, FontStyle.Bold);
+            //using var titleFont = new Font(SystemInformation.MenuFont, FontStyle.Bold);
+            using var titleFont = FastFont2.GetDefaultFont(style: FontStyle.Bold);
             titleSize = g.MeasureString(ToolTipTitle, titleFont);
 
             // bottom margin for tooltip title

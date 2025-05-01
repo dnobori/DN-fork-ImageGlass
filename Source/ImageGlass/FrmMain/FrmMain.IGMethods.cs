@@ -667,7 +667,8 @@ public partial class FrmMain
                 + this.ScaleToDpi(Config.GalleryColumns);
             if (Config.GalleryColumns == 1)
             {
-                gapWidth = (int)SystemInformation.MenuFont.SizeInPoints;
+                //gapWidth = (int)SystemInformation.MenuFont.SizeInPoints;
+                gapWidth = (int)ImageGlass.UI.FastFont1.GetDefaultFont().SizeInPoints;
             }
 
             var scrollBarSize = 0;
