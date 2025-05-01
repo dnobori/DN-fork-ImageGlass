@@ -317,14 +317,20 @@ public partial class BHelper
     /// </summary>
     /// <param name="filePath">Full file path.</param>
     /// <param name="useICM">Use color profile.</param>
-    public static Bitmap ToGdiPlusBitmap(string filePath, bool useICM = true)
+    public static Bitmap ToGdiPlusBitmap(string filePath, byte[] fileContents, bool useICM = true)
     {
-        using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        var ms = new MemoryStream();
-        fs.CopyTo(ms);
+        //using var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        //var ms = new MemoryStream();
+        //fs.CopyTo(ms);
+        //ms.Position = 0;
+
+        MemoryStream ms = new MemoryStream(fileContents);
+
         ms.Position = 0;
 
-        return new Bitmap(ms, useICM);
+        var ret = new Bitmap(ms, useICM);
+
+        return ret;
     }
 
 

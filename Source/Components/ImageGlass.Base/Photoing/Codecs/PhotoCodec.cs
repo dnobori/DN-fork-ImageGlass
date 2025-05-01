@@ -35,13 +35,7 @@ namespace ImageGlass.Base.Photoing.Codecs;
 public static class PhotoCodec
 {
 
-    #region Public functions
-
-    /// <summary>
-    /// Loads metadata from file.
-    /// </summary>
-    /// <param name="filePath">Full path of the file</param>
-    public static IgMetadata? LoadMetadata(string? filePath, CodecReadOptions? options = null)
+    public static IgMetadata? LoadMetadata_Legacy(string? filePath, CodecReadOptions? options = null)
     {
         FileInfo? fi = null;
         var meta = new IgMetadata() { FilePath = filePath ?? string.Empty };
@@ -218,6 +212,195 @@ public static class PhotoCodec
         return meta;
     }
 
+    #region Public functions
+    /// <summary>
+    /// Loads metadata from file.
+    /// </summary>
+    /// <param name="filePath">Full path of the file</param>
+    public static IgMetadata? LoadMetadata(string? filePath, byte[]? fileContents, FileInfo? fileInfo, CodecReadOptions? options = null)
+    {
+        FileInfo? fi = null;
+        var meta = new IgMetadata() { FilePath = filePath ?? string.Empty };
+
+        try
+        {
+            if (fileInfo == null)
+            {
+                fileInfo = new FileInfo(filePath);
+            }
+            fi = fileInfo;
+        }
+        catch { }
+        if (fi == null) return meta;
+        var ext = fi.Extension.ToUpperInvariant();
+
+        meta.FileName = fi.Name;
+        meta.FileExtension = ext;
+        meta.FolderPath = fi.DirectoryName ?? string.Empty;
+        meta.FolderName = Path.GetFileName(meta.FolderPath);
+
+        meta.FileSize = fi.Length;
+        meta.FileCreationTime = fi.CreationTime;
+        meta.FileLastWriteTime = fi.LastWriteTime;
+        meta.FileLastAccessTime = fi.LastAccessTime;
+
+        try
+        {
+            var settings = ParseSettings(options, false, filePath);
+            using var imgC = new MagickImageCollection();
+
+            //if (filePath.Length > 260)
+            //{
+            //var allBytes = File.ReadAllBytes(filePath);
+
+            //imgC.Ping(allBytes, settings);
+
+            //fileContents.Seek(0, SeekOrigin.Begin);
+            imgC.Ping(fileContents, settings);
+            //}
+            //else
+            //{
+            //    imgC.Ping(filePath, settings);
+            //}
+
+            meta.FrameIndex = 0;
+            meta.FrameCount = imgC.Count;
+
+            if (imgC.Count > 0)
+            {
+                var frameIndex = options?.FrameIndex ?? 0;
+
+                // Check if frame index is greater than upper limit
+                if (frameIndex >= imgC.Count)
+                    frameIndex = 0;
+
+                // Check if frame index is less than lower limit
+                else if (frameIndex < 0)
+                    frameIndex = imgC.Count - 1;
+
+                meta.FrameIndex = (uint)frameIndex;
+                using var imgM = imgC[frameIndex];
+
+
+                // image size
+                meta.OriginalWidth = imgM.BaseWidth;
+                meta.OriginalHeight = imgM.BaseHeight;
+
+                if (options?.AutoScaleDownLargeImage == true)
+                {
+                    var newSize = GetMaxImageRenderSize(imgM.BaseWidth, imgM.BaseHeight);
+
+                    meta.RenderedWidth = (uint)newSize.Width;
+                    meta.RenderedHeight = (uint)newSize.Height;
+                }
+                else
+                {
+                    meta.RenderedWidth = imgM.Width;
+                    meta.RenderedHeight = imgM.Height;
+                }
+
+
+                // image color
+                meta.HasAlpha = imgC.Any(i => i.HasAlpha);
+                meta.ColorSpace = imgM.ColorSpace.ToString();
+                meta.CanAnimate = CheckAnimatedFormat(imgC, ext);
+
+
+                // EXIF profile
+                if (imgM.GetExifProfile() is IExifProfile exifProfile)
+                {
+                    // ExifRatingPercent
+                    meta.ExifRatingPercent = GetExifValue(exifProfile, ExifTag.RatingPercent);
+
+                    // ExifDateTimeOriginal
+                    var dt = GetExifValue(exifProfile, ExifTag.DateTimeOriginal);
+                    meta.ExifDateTimeOriginal = BHelper.ConvertDateTime(dt);
+
+                    // ExifDateTime
+                    dt = GetExifValue(exifProfile, ExifTag.DateTime);
+                    meta.ExifDateTime = BHelper.ConvertDateTime(dt);
+
+                    meta.ExifArtist = GetExifValue(exifProfile, ExifTag.Artist);
+                    meta.ExifCopyright = GetExifValue(exifProfile, ExifTag.Copyright);
+                    meta.ExifSoftware = GetExifValue(exifProfile, ExifTag.Software);
+                    meta.ExifImageDescription = GetExifValue(exifProfile, ExifTag.ImageDescription);
+                    meta.ExifModel = GetExifValue(exifProfile, ExifTag.Model);
+                    meta.ExifISOSpeed = (int?)GetExifValue(exifProfile, ExifTag.ISOSpeed);
+
+                    var rational = GetExifValue(exifProfile, ExifTag.ExposureTime);
+                    meta.ExifExposureTime = rational.Denominator == 0
+                        ? null
+                        : rational.Numerator / rational.Denominator;
+
+                    rational = GetExifValue(exifProfile, ExifTag.FNumber);
+                    meta.ExifFNumber = rational.Denominator == 0
+                        ? null
+                        : rational.Numerator / rational.Denominator;
+
+                    rational = GetExifValue(exifProfile, ExifTag.FocalLength);
+                    meta.ExifFocalLength = rational.Denominator == 0
+                        ? null
+                        : rational.Numerator / rational.Denominator;
+                }
+                else
+                {
+                    try
+                    {
+                        using var fs = File.OpenRead(filePath);
+                        using var img = Image.FromStream(fs, false, false);
+                        var enc = new ASCIIEncoding();
+
+                        var EXIF_DateTimeOriginal = 0x9003; //36867
+                        var EXIF_DateTime = 0x0132;
+
+                        try
+                        {
+                            // get EXIF_DateTimeOriginal
+                            var pi = img.GetPropertyItem(EXIF_DateTimeOriginal);
+                            var dateTimeText = enc.GetString(pi.Value, 0, pi.Len - 1);
+
+                            if (DateTime.TryParseExact(dateTimeText, "yyyy:MM:dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out var exifDateTimeOriginal))
+                            {
+                                meta.ExifDateTimeOriginal = exifDateTimeOriginal;
+                            }
+                        }
+                        catch { }
+
+
+                        try
+                        {
+                            // get EXIF_DateTime
+                            var pi = img.GetPropertyItem(EXIF_DateTime);
+                            var dateTimeText = enc.GetString(pi.Value, 0, pi.Len - 1);
+
+                            if (DateTime.TryParseExact(dateTimeText, "yyyy:MM:dd HH:mm:ss", null, System.Globalization.DateTimeStyles.None, out var exifDateTime))
+                            {
+                                meta.ExifDateTime = exifDateTime;
+                            }
+                        }
+                        catch { }
+                    }
+                    catch { }
+                }
+
+
+                // Color profile
+                if (imgM.GetColorProfile() is IColorProfile colorProfile)
+                {
+                    meta.ColorProfile = colorProfile.ColorSpace.ToString();
+
+                    if (!string.IsNullOrWhiteSpace(colorProfile.Description))
+                    {
+                        meta.ColorProfile = $"{colorProfile.Description} ({meta.ColorProfile})";
+                    }
+                }
+            }
+        }
+        catch { }
+
+        return meta;
+    }
+
 
     /// <summary>
     /// Loads image file async.
@@ -225,7 +408,7 @@ public static class PhotoCodec
     /// <param name="filePath">Full path of the file</param>
     /// <param name="options">Loading options</param>
     /// <param name="token">Cancellation token</param>
-    public static async Task<IgImgData> LoadAsync(string filePath,
+    public static async Task<IgImgData> LoadAsync(string filePath, byte[] fileContents, FileInfo fileInfo,
         CodecReadOptions? options = null, ImgTransform? transform = null,
         CancellationToken? token = null)
     {
@@ -234,11 +417,11 @@ public static class PhotoCodec
 
         try
         {
-            var (loadSuccessful, result, ext, settings) = ReadWithStream(filePath, options, transform);
+            var (loadSuccessful, result, ext, settings) = ReadWithStream(filePath, fileContents, fileInfo, options, transform);
 
             if (!loadSuccessful)
             {
-                result = await LoadWithMagickImageAsync(filePath, ext, settings, options, transform, cancelToken);
+                result = await LoadWithMagickImageAsync(filePath, ext, fileContents, settings, options, transform, cancelToken);
             }
 
             return result;
@@ -248,6 +431,32 @@ public static class PhotoCodec
         return new IgImgData();
     }
 
+    public static async Task<IgImgData> LoadAsync_Legacy(string filePath,
+        CodecReadOptions? options = null, ImgTransform? transform = null,
+        CancellationToken? token = null)
+    {
+        if (token.HasValue)
+        {
+            token.Value.ThrowIfCancellationRequested();
+        }
+        FileInfo info = new FileInfo(filePath);
+        if (token.HasValue)
+        {
+            token.Value.ThrowIfCancellationRequested();
+        }
+        byte[] data;
+        using (var file = info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            if (token.HasValue)
+            {
+                token.Value.ThrowIfCancellationRequested();
+            }
+            data = new byte[file.Length];
+            file.Read(data, 0, data.Length);
+        }
+
+        return await LoadAsync(filePath, data, info, options, transform, token);
+    }
 
     /// <summary>
     /// Gets thumbnail from image.
@@ -270,7 +479,7 @@ public static class PhotoCodec
         var ext = Path.GetExtension(filePath).ToLowerInvariant();
 
 
-        var imgData = await ReadMagickImageAsync(filePath, ext, settings, options, null, new());
+        var imgData = await ReadMagickImageAsync_Legacy(filePath, ext, settings, options, null, new());
 
         if (imgData?.SingleFrameImage != null)
         {
@@ -415,7 +624,7 @@ public static class PhotoCodec
         {
             await imgM.ReadAsync(svgFilePath, settings, token);
         }
-        
+
 
         return imgM;
     }
@@ -453,7 +662,7 @@ public static class PhotoCodec
             var settings = ParseSettings(readOptions, true, srcFileName);
 
 
-            using var imgData = await ReadMagickImageAsync(
+            using var imgData = await ReadMagickImageAsync_Legacy(
                 srcFileName,
                 Path.GetExtension(srcFileName),
                 settings,
@@ -688,7 +897,7 @@ public static class PhotoCodec
 
 
             // for not supported formats
-            var bmp = await LoadAsync(srcFilePath, readOptions, transform, token);
+            var bmp = await LoadAsync_Legacy(srcFilePath, readOptions, transform, token);
             await SaveAsBase64Async(bmp.Image, srcExt, destFilePath, null, token);
         }
         catch (OperationCanceledException) { }
@@ -811,12 +1020,12 @@ public static class PhotoCodec
     /// <summary>
     /// Read image file using stream
     /// </summary>
-    private static (bool loadSuccessful, IgImgData result, string ext, MagickReadSettings settings) ReadWithStream(string filePath, CodecReadOptions? options = null, ImgTransform? transform = null, IgMetadata? metadata = null)
+    private static (bool loadSuccessful, IgImgData result, string ext, MagickReadSettings settings) ReadWithStream(string filePath, byte[] fileContents, FileInfo fileInfo, CodecReadOptions? options = null, ImgTransform? transform = null, IgMetadata? metadata = null)
     {
         options ??= new();
         var loadSuccessful = true;
 
-        metadata ??= LoadMetadata(filePath, options);
+        //metadata ??= LoadMetadata(filePath, options);
         var ext = Path.GetExtension(filePath).ToUpperInvariant();
         var settings = ParseSettings(options, false, filePath);
 
@@ -834,7 +1043,8 @@ public static class PhotoCodec
             case ".TXT": // base64 string
             case ".B64":
                 var base64Content = string.Empty;
-                using (var fs = new StreamReader(filePath))
+                MemoryStream ms = new MemoryStream(fileContents);
+                using (var fs = new StreamReader(ms))
                 {
                     base64Content = fs.ReadToEnd();
                 }
@@ -854,23 +1064,41 @@ public static class PhotoCodec
                 }
                 break;
 
+            case ".BMP":
             case ".GIF":
             case ".GIFV":
             case ".FAX":
+            case ".JPG":
+            case ".JPEG":
+            case ".PNG":
                 try
                 {
                     // Note: Using FileStream is much faster than using MagickImageCollection
                     if (result.CanAnimate)
                     {
-                        result.Source = BHelper.ToGdiPlusBitmap(filePath);
+                        result.Source = BHelper.ToGdiPlusBitmap(filePath, fileContents);
                     }
                     else
                     {
-                        result.Image = WicBitmapSource.Load(filePath);
+                        //using (var file = File.OpenRead(filePath))
+                        //{
+                        //    result.Image = WicBitmapSource.Load(filePath);
+                        //}
+
+                        //result.Image = WicBitmapSource.Load(filePath);
+
+                        var ms1 = new MemoryStream(fileContents);
+
+                        ms1.Position = 0;
+
+                        var img = WicBitmapSource.Load(ms1);
+
+                        result.Image = img;
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.ToString());
                     loadSuccessful = false;
                 }
                 break;
@@ -948,26 +1176,41 @@ public static class PhotoCodec
     /// <summary>
     /// Loads image file with Magick.NET
     /// </summary>
-    private static async Task<IgImgData> LoadWithMagickImageAsync(string filename, string ext,
+    private static async Task<IgImgData> LoadWithMagickImageAsync(string filename, string ext, byte[] fileContents,
         MagickReadSettings settings, CodecReadOptions options, ImgTransform? transform, CancellationToken cancelToken)
     {
-        var data = await ReadMagickImageAsync(filename, ext, settings, options, transform, cancelToken);
+        var data = await ReadMagickImageAsync(filename, ext, fileContents, settings, options, transform, cancelToken);
         var result = new IgImgData(data);
 
         return result;
     }
 
+    private static async Task<IgMagickReadData> ReadMagickImageAsync_Legacy(
+        string filePath, string ext, MagickReadSettings settings, CodecReadOptions options,
+        ImgTransform? transform, CancellationToken cancelToken)
+    {
+        byte[] data;
+        await using (var file = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        {
+            data = new byte[file.Length];
+            await file.ReadAsync(data, 0, (int)file.Length, cancelToken);
+        }
+
+        return await ReadMagickImageAsync(filePath, ext, data, settings, options, transform, cancelToken);
+    }
 
     /// <summary>
     /// Reads and processes image file with Magick.NET.
     /// </summary>
     private static async Task<IgMagickReadData> ReadMagickImageAsync(
-        string filePath, string ext, MagickReadSettings settings, CodecReadOptions options,
+        string filePath, string ext, byte[] fileContents, MagickReadSettings settings, CodecReadOptions options,
         ImgTransform? transform, CancellationToken cancelToken)
     {
+        MemoryStream ms = new MemoryStream(fileContents);
         var result = new IgMagickReadData() { Extension = ext };
         var imgColl = new MagickImageCollection();
-        imgColl.Ping(filePath, settings);
+        //imgColl.Ping(filePath, settings);
+        imgColl.Ping(ms, settings);
 
         // standardize first frame reading option
         result.FrameCount = imgColl.Count;
@@ -987,7 +1230,8 @@ public static class PhotoCodec
         // read all frames
         if (imgColl.Count > 1 && readFirstFrameOnly is false)
         {
-            await imgColl.ReadAsync(filePath, settings, cancelToken);
+            //await imgColl.ReadAsync(filePath, settings, cancelToken);
+            await imgColl.ReadAsync(ms, settings, cancelToken);
 
             var i = 0;
             foreach (var imgFrameM in imgColl)
@@ -1040,7 +1284,7 @@ public static class PhotoCodec
         if (!hasRequestedThumbnail)
         {
             imgM.Dispose();
-            imgM = (MagickImage)await InitializeSingleMagickImageAsync(filePath,
+            imgM = (MagickImage)await InitializeSingleMagickImageAsync(filePath, ms,
                 imgColl[0].BaseWidth, imgColl[0].BaseHeight, settings, options, cancelToken);
         }
 
@@ -1074,7 +1318,7 @@ public static class PhotoCodec
     /// according to the <see cref="CodecReadOptions.AutoScaleDownLargeImage"/>.
     /// </summary>
     public static async Task<IMagickImage> InitializeSingleMagickImageAsync(
-        string srcFilePath, uint srcWidth, uint srcHeight,
+        string srcFilePath, MemoryStream ms, uint srcWidth, uint srcHeight,
         MagickReadSettings settings, CodecReadOptions options, CancellationToken cancelToken)
     {
         var imgM = new MagickImage();
@@ -1083,9 +1327,10 @@ public static class PhotoCodec
         var isSizeTooLarge = srcWidth > Const.MAX_IMAGE_DIMENSION
             || srcHeight > Const.MAX_IMAGE_DIMENSION;
 
-        if (!isSizeTooLarge || !options.AutoScaleDownLargeImage)
+        //if (!isSizeTooLarge || !options.AutoScaleDownLargeImage)
         {
-            await imgM.ReadAsync(srcFilePath, settings, cancelToken);
+            //await imgM.ReadAsync(srcFilePath, settings, cancelToken);
+            await imgM.ReadAsync(ms, settings, cancelToken);
             return imgM;
         }
 

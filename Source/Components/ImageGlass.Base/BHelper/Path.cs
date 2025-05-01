@@ -450,14 +450,14 @@ public partial class BHelper
             {
                 return fileList
                     .OrderBy(f => Path.GetDirectoryName(f), dirPathComparer)
-                    .ThenByDescending(f => PhotoCodec.LoadMetadata(f).ExifDateTimeOriginal)
+                    .ThenByDescending(f => PhotoCodec.LoadMetadata_Legacy(f).ExifDateTimeOriginal)
                     .ThenBy(f => Path.GetFileName(f), new StringNaturalComparer()); // always by ASC
             }
             else
             {
                 return fileList
                     .OrderBy(f => Path.GetDirectoryName(f), dirPathComparer)
-                    .ThenBy(f => PhotoCodec.LoadMetadata(f).ExifDateTimeOriginal)
+                    .ThenBy(f => PhotoCodec.LoadMetadata_Legacy(f).ExifDateTimeOriginal)
                     .ThenBy(f => Path.GetFileName(f), filePathComparer);
             }
         }
@@ -469,14 +469,14 @@ public partial class BHelper
             {
                 return fileList
                     .OrderBy(f => Path.GetDirectoryName(f), dirPathComparer)
-                    .ThenByDescending(f => PhotoCodec.LoadMetadata(f).ExifRatingPercent)
+                    .ThenByDescending(f => PhotoCodec.LoadMetadata_Legacy(f).ExifRatingPercent)
                     .ThenBy(f => Path.GetFileName(f), new StringNaturalComparer()); // always by ASC
             }
             else
             {
                 return fileList
                     .OrderBy(f => Path.GetDirectoryName(f), dirPathComparer)
-                    .ThenBy(f => PhotoCodec.LoadMetadata(f).ExifRatingPercent)
+                    .ThenBy(f => PhotoCodec.LoadMetadata_Legacy(f).ExifRatingPercent)
                     .ThenBy(f => Path.GetFileName(f), filePathComparer);
             }
         }

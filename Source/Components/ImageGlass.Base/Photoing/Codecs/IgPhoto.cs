@@ -23,7 +23,7 @@ namespace ImageGlass.Base.Photoing.Codecs;
 /// Initialize <see cref="IgPhoto"/> instance
 /// </summary>
 /// <param name="filename"></param>
-public class IgPhoto(string filename) : IDisposable
+public class IgPhoto(string filename, byte[]? fileContents = null, FileInfo? fileInfo = null) : IDisposable
 {
     #region IDisposable Disposing
 
@@ -104,6 +104,9 @@ public class IgPhoto(string filename) : IDisposable
     /// </summary>
     public IgMetadata? Metadata { get; set; }
 
+    public byte[]? FileContents { get; set; } = fileContents;
+    public FileInfo? FileInfo { get; set; } = fileInfo;
+
     #endregion
 
 
@@ -132,7 +135,19 @@ public class IgPhoto(string filename) : IDisposable
         try
         {
             // load image data
-            Metadata ??= PhotoCodec.LoadMetadata(Filename, options);
+            if (this.FileContents == null || this.FileInfo == null)
+            {
+                this.FileInfo = new FileInfo(this.Filename);
+
+                using (var file = this.FileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    this.FileContents = new byte[file.Length];
+                    file.Read(this.FileContents, 0, this.FileContents.Length);
+                }
+            }
+
+            Metadata ??= PhotoCodec.LoadMetadata(Filename, this.FileContents, this.FileInfo, options);
+
             FrameCount = Metadata?.FrameCount ?? 0;
 
             if (options.FirstFrameOnly == null)
@@ -150,7 +165,10 @@ public class IgPhoto(string filename) : IDisposable
             }
 
             // load image
-            ImgData = await PhotoCodec.LoadAsync(Filename, options, null, _tokenSrc?.Token);
+
+            ImgData = await PhotoCodec.LoadAsync(Filename,
+                this.FileContents, this.FileInfo,
+                options, null, _tokenSrc?.Token);
 
             // cancel if requested
             if (_tokenSrc is not null && _tokenSrc.IsCancellationRequested)

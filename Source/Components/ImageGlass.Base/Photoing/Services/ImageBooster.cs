@@ -274,7 +274,7 @@ public class ImageBooster : IDisposable
             {
                 // use cache metadata
                 var metadata = ImgList[itemIndex].Metadata;
-                metadata ??= PhotoCodec.LoadMetadata(ImgList[itemIndex].Filename);
+                metadata ??= PhotoCodec.LoadMetadata_Legacy(ImgList[itemIndex].Filename);
 
                 // check image dimension
                 var notExceedDimension = MaxImageDimensionToCache <= 0
@@ -328,7 +328,7 @@ public class ImageBooster : IDisposable
             if (ImgList[index].Metadata == null
                 || ImgList[index].Metadata.FrameIndex != frameIndex)
             {
-                ImgList[index].Metadata = PhotoCodec.LoadMetadata(
+                ImgList[index].Metadata = PhotoCodec.LoadMetadata_Legacy(
                     ImgList[index].Filename,
                     ReadOptions with
                     {

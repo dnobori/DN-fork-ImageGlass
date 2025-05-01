@@ -118,7 +118,7 @@ public class FileSystemAdaptor : IAdaptor
     {
         if (_isDisposed) return new IgMetadata();
 
-        return PhotoCodec.LoadMetadata(filePath);
+        return PhotoCodec.LoadMetadata_Legacy(filePath);
     }
 
     /// <summary>

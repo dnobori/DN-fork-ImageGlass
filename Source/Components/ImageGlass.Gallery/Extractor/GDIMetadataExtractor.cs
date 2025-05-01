@@ -199,7 +199,7 @@ public partial class GDIExtractor : IExtractor
     /// <param name="path">Filepath of image</param>
     public virtual IgMetadata GetMetadata(string path)
     {
-        return PhotoCodec.LoadMetadata(path);
+        return PhotoCodec.LoadMetadata_Legacy(path);
     }
 
     #endregion

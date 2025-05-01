@@ -713,6 +713,25 @@ public partial class FrmMain : ThemedForm
 
         try
         {
+#pragma warning disable IDISP001 // Dispose created
+            byte[]? fileContents = null;
+            FileInfo? fileInfo = null;
+#pragma warning restore IDISP001 // Dispose created
+
+            if (!string.IsNullOrEmpty(filePath))
+            {
+                using (var fileReader = File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    fileContents = new byte[fileReader.Length];
+
+#pragma warning disable CA2022 // 'Stream.Read' による不正確な読み取りを避ける
+                    fileReader.Read(fileContents, 0, fileContents.Length);
+#pragma warning restore CA2022 // 'Stream.Read' による不正確な読み取りを避ける
+                }
+
+                fileInfo = new FileInfo(filePath);
+            }
+
             // Validate image index
             #region Validate image index
 
@@ -801,14 +820,15 @@ public partial class FrmMain : ThemedForm
             // load image metadata
             if (!string.IsNullOrEmpty(filePath))
             {
-                photo = new IgPhoto(filePath);
+                photo = new IgPhoto(filePath, fileContents, fileInfo);
                 readSettings.FirstFrameOnly = Config.SingleFrameFormats.Contains(photo.Extension);
 
                 if (isSkipCache || Local.Metadata == null
                     || !Local.Metadata.FilePath.Equals(filePath, StringComparison.OrdinalIgnoreCase)
                     || Local.Metadata.FrameIndex != frameIndex)
                 {
-                    Local.Metadata = PhotoCodec.LoadMetadata(filePath, readSettings);
+                    Local.Metadata = PhotoCodec.LoadMetadata(filePath, fileContents, fileInfo, readSettings);
+                    //Local.Metadata = new IgMetadata { FilePath = filePath };
                 }
             }
             else
@@ -856,7 +876,7 @@ public partial class FrmMain : ThemedForm
             // if we are using Webview2
             if (useWebview2)
             {
-                photo = new IgPhoto(imgFilePath)
+                photo = new IgPhoto(imgFilePath, fileContents, fileInfo)
                 {
                     Metadata = Local.Metadata,
                 };

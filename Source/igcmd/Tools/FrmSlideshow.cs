@@ -813,7 +813,7 @@ public partial class FrmSlideshow : ThemedForm
         try
         {
             // get metadata
-            _currentMetadata = PhotoCodec.LoadMetadata(imgFilePath, readSettings);
+            _currentMetadata = PhotoCodec.LoadMetadata_Legacy(imgFilePath, readSettings);
 
             // check if we should use Webview2 viewer
             var useWebview2 = Config.UseWebview2ForSvg

@@ -43,7 +43,7 @@ public partial class FrmExportFrames : DialogForm
         SrcFilePath = srcFilePath;
         DestDirPath = destDirPath;
 
-        FrameCount = PhotoCodec.LoadMetadata(SrcFilePath).FrameCount;
+        FrameCount = PhotoCodec.LoadMetadata_Legacy(SrcFilePath).FrameCount;
         ProgressBar.Step = 1000;
         ProgressBar.Maximum = FrameCount * ProgressBar.Step;
         ProgressBar.UseMarqueeStyle = true;
