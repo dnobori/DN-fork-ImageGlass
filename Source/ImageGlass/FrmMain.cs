@@ -496,11 +496,11 @@ public partial class FrmMain : ThemedForm
                 // path is file
                 else
                 {
-                    if (string.Equals(Path.GetExtension(aPath), ".lnk", StringComparison.OrdinalIgnoreCase))
+                    /*if (string.Equals(Path.GetExtension(aPath), ".lnk", StringComparison.OrdinalIgnoreCase))
                     {
                         dirPath = FileShortcutApi.GetTargetPathFromShortcut(aPath);
                     }
-                    else
+                    else*/
                     {
                         dirPath = Path.GetDirectoryName(aPath) ?? string.Empty;
                     }

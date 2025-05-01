@@ -27,7 +27,7 @@ public static class FileShortcutApi
         Minimized = 7,
     }
 
-
+    /*
     /// <summary>
     /// Get the target path from shortcut (*.lnk)
     /// </summary>
@@ -76,5 +76,5 @@ public static class FileShortcutApi
             shortcut.Save();
         }
         catch { }
-    }
+    }*/
 }

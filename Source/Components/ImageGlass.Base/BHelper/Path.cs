@@ -96,7 +96,7 @@ public partial class BHelper
             else
             {
                 string dir;
-                if (string.Equals(Path.GetExtension(path), ".lnk", StringComparison.CurrentCultureIgnoreCase))
+                /*if (string.Equals(Path.GetExtension(path), ".lnk", StringComparison.CurrentCultureIgnoreCase))
                 {
                     var shortcutPath = FileShortcutApi.GetTargetPathFromShortcut(path);
                     var shortcutPathType = CheckPath(shortcutPath);
@@ -112,7 +112,7 @@ public partial class BHelper
                         dir = Path.GetDirectoryName(shortcutPath) ?? "";
                     }
                 }
-                else
+                else*/
                 {
                     dir = Path.GetDirectoryName(path) ?? "";
                 }
@@ -171,10 +171,10 @@ public partial class BHelper
         // Parse environment vars to absolute path
         path = Environment.ExpandEnvironmentVariables(path);
 
-        if (string.Equals(Path.GetExtension(inputPath), ".lnk", StringComparison.CurrentCultureIgnoreCase))
+        /*if (string.Equals(Path.GetExtension(inputPath), ".lnk", StringComparison.CurrentCultureIgnoreCase))
         {
             path = FileShortcutApi.GetTargetPathFromShortcut(path);
-        }
+        }*/
 
         return path;
     }
