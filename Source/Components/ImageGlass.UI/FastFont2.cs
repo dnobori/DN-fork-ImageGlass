@@ -36,8 +36,8 @@ public static class FastFont2
         LoadFontFile("meiryo.ttc");
     }
 
-    //public static Font GetDefaultFont() => GetCachedFont("Meiryo UI");
-    public static Font GetDefaultFont() => GetCachedFont("Meiryo UI");
+    //public static Font GetDefaultFont() => GetCachedFont("ＭＳ ゴシック");
+    public static Font GetDefaultFont() => GetCachedFont("Yu Gothic UI");
 
     public static void LoadFontFile(string fontFileName)
     {
