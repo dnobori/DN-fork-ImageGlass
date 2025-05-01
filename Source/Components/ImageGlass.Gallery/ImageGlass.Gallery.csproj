@@ -9,7 +9,7 @@
         <FileVersion>$(Version)</FileVersion>
         <Copyright>Copyright © 2010 - 2025 Duong Dieu Phap</Copyright>
         <Platforms>x64;ARM64</Platforms>
-        <Configurations>Debug;Release;Publish_Release</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
 

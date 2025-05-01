@@ -22,7 +22,7 @@
         <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
         <DebugType>portable</DebugType>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-        <Configurations>Debug;Release;Publish_Release</Configurations>
+        <Configurations>Debug;Release</Configurations>
 
         <LangVersion>latest</LangVersion>
         <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>

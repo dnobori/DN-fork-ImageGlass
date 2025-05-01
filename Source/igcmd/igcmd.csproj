@@ -17,7 +17,7 @@
         <EntryPointExe>$(AssemblyName).exe</EntryPointExe>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-        <Configurations>Debug;Release;Publish_Release</Configurations>
+        <Configurations>Debug;Release</Configurations>
 
         <LangVersion>latest</LangVersion>
         <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>

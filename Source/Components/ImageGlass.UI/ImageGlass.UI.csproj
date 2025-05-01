@@ -10,7 +10,7 @@
         <Version>9.2.0.1208</Version>
         <FileVersion>$(Version)</FileVersion>
         <Copyright>Copyright © 2010 - 2025 Duong Dieu Phap</Copyright>
-        <Configurations>Debug;Release;Publish_Release</Configurations>
+        <Configurations>Debug;Release</Configurations>
         <LangVersion>latest</LangVersion>
         <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
     </PropertyGroup>
